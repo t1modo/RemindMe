@@ -9,6 +9,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web"
   },
+  "proxy": "https://localhost:4000",
   "dependencies": {
     "@mui/icons-material": "^6.1.7",
     "@react-navigation/bottom-tabs": "^7.0.2",
