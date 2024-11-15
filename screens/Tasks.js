@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, StyleSheet, FlatList, TouchableOpacity, Alert } from "react-native";
-import { FontAwesome } from '@expo/vector-icons'; // This is for Expo's vector icons
-import { Calendar } from 'react-native-calendars'; // Import Calendar component
+import { FontAwesome } from '@expo/vector-icons';
+import { Calendar } from 'react-native-calendars';
+import { LinearGradient } from 'expo-linear-gradient'; // Import LinearGradient
 
 // Helper function to sort tasks by due date (closest date at top)
 const sortTasksByDueDate = (tasks) => {
@@ -11,8 +12,8 @@ const sortTasksByDueDate = (tasks) => {
 // Helper function to format date in MM/DD/YYYY
 const formatDate = (dateString) => {
     const date = new Date(dateString);
-    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Get month and ensure it's 2 digits
-    const day = (date.getDate() + 1).toString().padStart(2, '0'); // Get day and ensure it's 2 digits
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = (date.getDate() + 1).toString().padStart(2, '0');
     const year = date.getFullYear();
     return `${month}/${day}/${year}`;
 };
@@ -20,14 +21,13 @@ const formatDate = (dateString) => {
 const Tasks = () => {
     const [tasks, setTasks] = useState([]);
     const [showModal, setShowModal] = useState(false);
-    const [showCalendarModal, setShowCalendarModal] = useState(false); // New state for showing calendar
+    const [showCalendarModal, setShowCalendarModal] = useState(false);
     const [className, setClassName] = useState("");
     const [assignmentName, setAssignmentName] = useState("");
     const [dueDate, setDueDate] = useState("");
-    const [markedDate, setMarkedDate] = useState(''); // Track the marked date for proper bubble placement
+    const [markedDate, setMarkedDate] = useState('');
 
     const handleAddTask = () => {
-        // Check for duplicates based on assignment name
         const duplicateTask = tasks.some((task) => task.assignmentName === assignmentName);
         if (duplicateTask) {
             Alert.alert("Duplicate Task", "The task you are trying to add already exists.");
@@ -40,16 +40,15 @@ const Tasks = () => {
         }
 
         const newTask = {
-            id: `${Date.now()}`, // Unique id based on timestamp
+            id: `${Date.now()}`,
             class: className,
             assignmentName: assignmentName,
             dueDate: dueDate,
         };
 
         const updatedTasks = [...tasks, newTask];
-        setTasks(sortTasksByDueDate(updatedTasks)); // Sort the tasks after adding a new one
+        setTasks(sortTasksByDueDate(updatedTasks));
 
-        // Reset the modal and task details for a fresh entry
         setShowModal(false);
         setClassName('');
         setAssignmentName('');
@@ -65,131 +64,128 @@ const Tasks = () => {
         </View>
     );
 
-    // Handle date selection from the calendar
     const handleDateSelect = (date) => {
-        const selectedDate = date.dateString; // Date is in the format YYYY-MM-DD
-        setDueDate(selectedDate); // Set the selected date to state
-        setMarkedDate(selectedDate); // Set the marked date for the calendar
-        setShowCalendarModal(false); // Close the calendar modal after selection
+        const selectedDate = date.dateString;
+        setDueDate(selectedDate);
+        setMarkedDate(selectedDate);
+        setShowCalendarModal(false);
     };
 
     useEffect(() => {
-        // Update the list order when tasks are added or updated
         setTasks(sortTasksByDueDate(tasks));
     }, [tasks]);
 
-    // Get today's date and format it to match the format used by the calendar
     const today = new Date().toISOString().split('T')[0];
 
     return (
-        <View style={styles.container}>
-            {/* Scrollable area with vertical task display */}
-            <FlatList
-                data={tasks}
-                renderItem={renderItem}
-                keyExtractor={(item) => item.id}
-                contentContainerStyle={styles.tasksList}
-            />
-            
-            {/* Floating Add Task Button */}
-            <TouchableOpacity 
-                style={styles.addButton} 
-                onPress={() => setShowModal(true)}
-            >
-                <FontAwesome name="plus-circle" size={40} color="#fff" />
-            </TouchableOpacity>
+        <LinearGradient
+            colors={['#40916c', '#52b788', '#74c69d']}
+            style={styles.gradientContainer}
+        >
+            <View style={styles.container}>
+                <FlatList
+                    data={tasks}
+                    renderItem={renderItem}
+                    keyExtractor={(item) => item.id}
+                    contentContainerStyle={styles.tasksList}
+                />
+                
+                <TouchableOpacity 
+                    style={styles.addButton} 
+                    onPress={() => setShowModal(true)}
+                >
+                    <FontAwesome name="plus-circle" size={40} color="#fff" />
+                </TouchableOpacity>
 
-            {showModal && (
-                <View style={styles.modal}>
-                    <View style={styles.modalContent}>
-                        {/* Class Label and Input */}
-                        <View style={styles.inputContainer}>
-                            <Text style={styles.label}>Class</Text>
-                            <TextInput
-                                style={styles.input}
-                                value={className}
-                                onChangeText={setClassName}
-                            />
+                {showModal && (
+                    <View style={styles.modal}>
+                        <View style={styles.modalContent}>
+                            <View style={styles.inputContainer}>
+                                <Text style={styles.label}>Class</Text>
+                                <TextInput
+                                    style={styles.input}
+                                    value={className}
+                                    onChangeText={setClassName}
+                                />
+                            </View>
+
+                            <View style={styles.inputContainer}>
+                                <Text style={styles.label}>Assignment Name</Text>
+                                <TextInput
+                                    style={styles.input}
+                                    value={assignmentName}
+                                    onChangeText={setAssignmentName}
+                                />
+                            </View>
+
+                            <View style={styles.inputContainer}>
+                                <Text style={styles.label}>Due Date</Text>
+                                <TouchableOpacity 
+                                    style={styles.input} 
+                                    onPress={() => setShowCalendarModal(true)}
+                                >
+                                    <Text style={styles.inputText}>{dueDate ? formatDate(dueDate) : 'Select a date'}</Text>
+                                </TouchableOpacity>
+                            </View>
+
+                            <View style={styles.buttonsContainer}>
+                                <TouchableOpacity style={styles.saveButton} onPress={handleAddTask}>
+                                    <Text style={styles.saveButtonText}>Save Task</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.cancelButton} onPress={() => setShowModal(false)}>
+                                    <Text style={styles.cancelButtonText}>Cancel</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
+                    </View>
+                )}
 
-                        {/* Assignment Name Label and Input */}
-                        <View style={styles.inputContainer}>
-                            <Text style={styles.label}>Assignment Name</Text>
-                            <TextInput
-                                style={styles.input}
-                                value={assignmentName}
-                                onChangeText={setAssignmentName}
+                {showCalendarModal && (
+                    <View style={styles.calendarModal}>
+                        <View style={styles.calendarModalContent}>
+                            <Calendar
+                                onDayPress={handleDateSelect}
+                                markedDates={{
+                                    [markedDate]: { selected: true, selectedColor: '#40916C', selectedTextColor: '#fff' },
+                                }}
+                                monthFormat={'MMMM yyyy'}
+                                markingType="simple"
+                                theme={{
+                                    textSectionTitleColor: '#000',
+                                    arrowColor: '#40916C',
+                                    dayTextColor: '#000',
+                                    selectedDayBackgroundColor: '#40916C',
+                                    selectedDayTextColor: '#ffffff',
+                                    todayTextColor: '#40916C',
+                                }}
+                                minDate={today}
                             />
-                        </View>
-
-                        {/* Due Date Label and Calendar */}
-                        <View style={styles.inputContainer}>
-                            <Text style={styles.label}>Due Date</Text>
                             <TouchableOpacity 
-                                style={styles.input} 
-                                onPress={() => setShowCalendarModal(true)} // Trigger calendar on press
+                                style={styles.closeCalendarButton} 
+                                onPress={() => setShowCalendarModal(false)}
                             >
-                                <Text style={styles.inputText}>{dueDate ? formatDate(dueDate) : 'Select a date'}</Text>
-                            </TouchableOpacity>
-                        </View>
-
-                        {/* Save and Cancel Buttons */}
-                        <View style={styles.buttonsContainer}>
-                            <TouchableOpacity style={styles.saveButton} onPress={handleAddTask}>
-                                <Text style={styles.saveButtonText}>Save Task</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.cancelButton} onPress={() => setShowModal(false)}>
-                                <Text style={styles.cancelButtonText}>Cancel</Text>
+                                <Text style={styles.closeCalendarButtonText}>Close</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
-                </View>
-            )}
-
-            {/* Calendar Popup for Due Date */}
-            {showCalendarModal && (
-                <View style={styles.calendarModal}>
-                    <View style={styles.calendarModalContent}>
-                        <Calendar
-                            onDayPress={handleDateSelect}
-                            markedDates={{
-                                [markedDate]: { selected: true, selectedColor: '#40916C', selectedTextColor: '#fff' }, // Only the selected date should have the green bubble
-                            }}
-                            monthFormat={'MMMM yyyy'}
-                            markingType="simple"
-                            theme={{
-                                textSectionTitleColor: '#000',  // Black color for the month/year text between arrows
-                                arrowColor: '#40916C',  // Color of the arrows themselves
-                                dayTextColor: '#000',  // This changes the day text color to black
-                                selectedDayBackgroundColor: '#40916C',  // Highlighted day background color
-                                selectedDayTextColor: '#ffffff',  // Selected day text color
-                                todayTextColor: '#40916C',  // Today's date text color (highlighted)
-                            }}
-                            minDate={today} // Disable past dates
-                        />
-                        <TouchableOpacity 
-                            style={styles.closeCalendarButton} 
-                            onPress={() => setShowCalendarModal(false)}
-                        >
-                            <Text style={styles.closeCalendarButtonText}>Close</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            )}
-        </View>
+                )}
+            </View>
+        </LinearGradient>
     );
 };
 
 const styles = StyleSheet.create({
+    gradientContainer: {
+        flex: 1,
+    },
     container: {
         flex: 1,
-        backgroundColor: "#fff",
         justifyContent: "flex-start",
         alignItems: "center",
         padding: 20,
     },
     tasksList: {
-        flexGrow: 1,  // Ensures the FlatList content is scrollable
+        flexGrow: 1,
         width: '100%',
         marginTop: 20,
     },
@@ -209,12 +205,12 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: "bold",
         color: "#1F2937",
-        marginRight: 10,  // Space between Class and Assignment Name
+        marginRight: 10,
     },
     taskName: {
         fontSize: 16,
         color: "#1F2937",
-        marginRight: 10,  // Space between Assignment Name and Due Date
+        marginRight: 10,
     },
     dueDate: {
         fontSize: 14,
@@ -224,9 +220,9 @@ const styles = StyleSheet.create({
         position: "absolute",
         bottom: 20,
         right: 20,
-        backgroundColor: "#40916C",  // Updated to new green color
+        backgroundColor: "#40916C",
         borderRadius: 50,
-        padding: 15,
+        padding: 10,
         elevation: 5,
     },
     modal: {
@@ -270,7 +266,7 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
     },
     saveButton: {
-        backgroundColor: "#40916C", // Updated to new green color
+        backgroundColor: "#40916C",
         padding: 10,
         borderRadius: 5,
         width: "45%",
@@ -312,7 +308,7 @@ const styles = StyleSheet.create({
     },
     closeCalendarButton: {
         marginTop: 20,
-        backgroundColor: "#40916C", // Updated to new green color
+        backgroundColor: "#40916C",
         padding: 10,
         borderRadius: 5,
         justifyContent: "center",
