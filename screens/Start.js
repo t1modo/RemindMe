@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, ImageBackground, TouchableOpacity, StyleSheet } from 'react-native';
-import MaskedView from '@react-native-masked-view/masked-view';
-import { LinearGradient } from 'expo-linear-gradient';
+import { LinearGradient } from 'expo-linear-gradient';  // For gradient styling
 import { useNavigation } from '@react-navigation/native';
 
 const Start = () => {
@@ -9,31 +8,22 @@ const Start = () => {
 
   return (
     <ImageBackground
-      source={require('./../assets/background.jpg')} 
+      source={require('../assets/background.jpg')}  // Ensure the path is correct for the background image
       style={styles.background}
     >
       <View style={styles.headerContainer}>
-        <MaskedView
-          maskElement={
-            <Text style={styles.headerText}>
-              RemindMe
-            </Text>
-          }
-          style={styles.maskedView}
-        >
-          <LinearGradient
-            colors={['#FF9E00', '#FF6D00']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.gradient}
-          />
-        </MaskedView>
+        <Text style={styles.headerText}>RemindMe</Text>
       </View>
 
       <View style={styles.container}>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate('Login')}
+          onPress={() => {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'Main' }],
+            });
+          }}
         >
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
@@ -65,15 +55,7 @@ const styles = StyleSheet.create({
     fontSize: 40,
     fontWeight: 'bold',
     backgroundColor: 'transparent',
-  },
-  maskedView: {
-    height: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  gradient: {
-    height: 50,
-    width: 200,
+    color: '#fff',  // Ensure the text is visible on the background
   },
   container: {
     flex: 1,
