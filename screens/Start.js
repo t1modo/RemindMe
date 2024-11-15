@@ -9,11 +9,9 @@ const Start = () => {
 
   return (
     <ImageBackground
-      // Replace the path below with your wallpaper path
       source={require('./../assets/background.jpg')} 
       style={styles.background}
     >
-      {/* Title Text with Gradient */}
       <View style={styles.headerContainer}>
         <MaskedView
           maskElement={
@@ -24,7 +22,7 @@ const Start = () => {
           style={styles.maskedView}
         >
           <LinearGradient
-            colors={['#FF6F61', '#FFB88C']} // Adjust gradient colors as desired
+            colors={['#FF9E00', '#FF6D00']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.gradient}
@@ -34,16 +32,16 @@ const Start = () => {
 
       <View style={styles.container}>
         <TouchableOpacity
-          style={styles.loginButton}
+          style={styles.button}
           onPress={() => navigation.navigate('Login')}
         >
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.registerButton}
+          style={styles.button}
           onPress={() => navigation.navigate('Register')}
         >
-          <Text style={styles.buttonText}>Create Account</Text>
+          <Text style={styles.buttonText}>Register</Text>
         </TouchableOpacity>
       </View>
     </ImageBackground>
@@ -61,7 +59,7 @@ const styles = StyleSheet.create({
     top: 60,
     width: '100%',
     alignItems: 'center',
-    zIndex: 1, // Ensures the title appears above the background
+    zIndex: 1,
   },
   headerText: {
     fontSize: 40,
@@ -82,25 +80,18 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     padding: 20,
   },
-  loginButton: {
+  button: {
     backgroundColor: '#166088',
     padding: 20,
     marginBottom: 10,
-    borderRadius: 20,
-    alignItems: 'center',
-  },
-  registerButton: {
-    backgroundColor: 'white',
-    padding: 20,
-    marginBottom: 50,
-    borderRadius: 20,
+    borderRadius: 30,
     alignItems: 'center',
   },
   buttonText: {
     color: '#fff',
     fontSize: 20,
     fontWeight: 'bold',
-  },
+  }
 });
 
 export default Start;
