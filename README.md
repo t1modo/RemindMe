@@ -21,4 +21,4 @@ RemindMe is a mobile application designed for students to help them stay organiz
 
 - **React Native**: A JavaScript framework for building cross-platform mobile apps.
 - **Expo**: A set of tools for React Native that simplifies development, testing, and deployment.
-- **MongoDB**: A NoSQL database for storing user data and assignments.
+- **Firebase**: A comprehensive backend platform for storing user data and assignments, enabling real-time data synchronization and secure account management.
