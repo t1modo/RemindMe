@@ -1,6 +1,13 @@
 import React from 'react';
-import { View, Text, ImageBackground, TouchableOpacity, StyleSheet } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';  // For gradient styling
+import {
+  View,
+  Text,
+  ImageBackground,
+  TouchableOpacity,
+  StyleSheet,
+} from 'react-native';
+import MaskedView from '@react-native-masked-view/masked-view';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 
 const Start = () => {
@@ -8,11 +15,23 @@ const Start = () => {
 
   return (
     <ImageBackground
-      source={require('../assets/background.jpg')}  // Ensure the path is correct for the background image
+      source={require('../assets/background.jpg')}
       style={styles.background}
     >
       <View style={styles.headerContainer}>
-        <Text style={styles.headerText}>RemindMe</Text>
+        <MaskedView
+          maskElement={
+            <Text style={styles.headerText}>RemindMe</Text>
+          }
+          style={styles.maskedView}
+        >
+          <LinearGradient
+            colors={['#BEE9E8', '#62B6CB']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.gradient}
+          />
+        </MaskedView>
       </View>
 
       <View style={styles.container}>
@@ -21,7 +40,7 @@ const Start = () => {
           onPress={() => {
             navigation.reset({
               index: 0,
-              routes: [{ name: 'Main' }],
+              routes: [{ name: 'Login' }],
             });
           }}
         >
@@ -49,13 +68,21 @@ const styles = StyleSheet.create({
     top: 60,
     width: '100%',
     alignItems: 'center',
-    zIndex: 1,
+  },
+  maskedView: {
+    height: 50, // Match text size
+    width: 200, // Width to fit the text
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   headerText: {
     fontSize: 40,
     fontWeight: 'bold',
-    backgroundColor: 'transparent',
-    color: '#fff',  // Ensure the text is visible on the background
+    backgroundColor: 'transparent', // Ensure mask works
+  },
+  gradient: {
+    height: 50, // Same as MaskedView height
+    width: 200, // Same as MaskedView width
   },
   container: {
     flex: 1,
@@ -73,7 +100,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 20,
     fontWeight: 'bold',
-  }
+  },
 });
 
 export default Start;
