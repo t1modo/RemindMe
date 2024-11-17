@@ -5,6 +5,8 @@ import * as Yup from 'yup';
 import { Ionicons, Octicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { db } from '../components/FirebaseConfig';
+import { setDoc, doc } from 'firebase/firestore';
 
 // Colors
 const Colors = {
@@ -28,7 +30,7 @@ const validationSchema = Yup.object().shape({
 const Register = ({ navigation }) => {
   const [hidePassword, setHidePassword] = useState(true);
   const [hideConfirmPassword, setHideConfirmPassword] = useState(true);
-  
+
   // Animated focus states
   const [emailFocusAnimation] = useState(new Animated.Value(1));
   const [passwordFocusAnimation] = useState(new Animated.Value(1));
@@ -57,42 +59,26 @@ const Register = ({ navigation }) => {
     }).start();
   };
 
-  const handleBlur = (field) => {
-    if (focusedField === field) {
-      setFocusedField(null);
-    }
-
-    Animated.spring(emailFocusAnimation, {
-      toValue: focusedField === 'email' ? 1.05 : 1,
-      friction: 5,
-      useNativeDriver: true,
-    }).start();
-
-    Animated.spring(passwordFocusAnimation, {
-      toValue: focusedField === 'password' ? 1.05 : 1,
-      friction: 5,
-      useNativeDriver: true,
-    }).start();
-
-    Animated.spring(confirmFocusAnimation, {
-      toValue: focusedField === 'confirmPassword' ? 1.05 : 1,
-      friction: 5,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  const handleRegister = (values) => {
+  const handleRegister = async (values) => {
     const { email, password } = values;
-    
+
     const auth = getAuth();
-    createUserWithEmailAndPassword(auth, email, password)
-      .then(() => {
-        Alert.alert('Account registered successfully!');
-        navigation.replace('Main');
-      })
-      .catch((error) => {
-        Alert.alert('Registration failed', error.message);
+    try {
+      // Create user with email and password
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Create user document in Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        email: user.email,
+        uid: user.uid,
       });
+
+      Alert.alert('Account registered successfully!');
+      navigation.replace('Main');
+    } catch (error) {
+      Alert.alert('Registration failed', error.message);
+    }
   };
 
   return (
@@ -199,18 +185,18 @@ const CustomTextInput = ({ icon, isPassword, hidePassword, setHidePassword, erro
 const styles = StyleSheet.create({
   registerContainer: {
     flex: 1,
-    padding: 25,
-    paddingTop: 70,
+    padding: 20,
+    justifyContent: 'center',
   },
   innerContainer: {
     flex: 1,
-    alignItems: 'flex-start',
+    justifyContent: 'center',
   },
   pageTitle: {
     fontSize: 50,
     fontWeight: 'bold',
     color: '#034078',
-    marginTop: 60,
+    marginTop: 20,
   },
   subTitle: {
     fontSize: 16,
@@ -261,14 +247,14 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   extraText: {
-    color: darkLight,
-    fontSize: 16,
+    color: tertiary,
+    fontSize: 15,
   },
   textLink: {
-    fontSize: 16,
+    fontSize: 14,
   },
   textLinkContent: {
-    color: '#036F71',
+    color: '#166088',
     fontWeight: 'bold',
     fontSize: 16,
   },

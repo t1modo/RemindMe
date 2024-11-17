@@ -1,7 +1,8 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { AuthProvider, useAuth } from './components/AuthContext';  // Assuming you're using context for auth
-import RootStack from './navigators/RootStack';  // Import RootStack
+import { AuthProvider, useAuth } from './components/AuthContext';
+import RootStack from './navigators/RootStack';
+import Loading from './components/Loading.js';
 
 const App = () => {
   return (
@@ -12,11 +13,15 @@ const App = () => {
 };
 
 const NavigationWrapper = () => {
-  const { isLoggedIn } = useAuth();  // Get login state
+  const { user, loading } = useAuth(); // Get loading state
+
+  if (loading) {
+    return <Loading size={50} stroke={4} speed={1} color="#40916C" />;
+  }
 
   return (
     <NavigationContainer>
-      {isLoggedIn ? <RootStack /> : <RootStack />}  {/* Use RootStack for both cases */}
+      <RootStack />
     </NavigationContainer>
   );
 };

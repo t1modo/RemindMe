@@ -70,19 +70,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   maskedView: {
-    height: 50, // Match text size
-    width: 200, // Width to fit the text
+    height: 50,
+    width: 200,
     alignItems: 'center',
     justifyContent: 'center',
   },
   headerText: {
     fontSize: 40,
     fontWeight: 'bold',
-    backgroundColor: 'transparent', // Ensure mask works
+    backgroundColor: 'transparent',
   },
   gradient: {
-    height: 50, // Same as MaskedView height
-    width: 200, // Same as MaskedView width
+    height: 50,
+    width: 200,
   },
   container: {
     flex: 1,
