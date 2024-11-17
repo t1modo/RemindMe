@@ -7,7 +7,6 @@ import Start from '../screens/Start';
 import Login from '../screens/Login';
 import Register from '../screens/Register';
 import Main from '../navigators/Main';
-import Tasks from '../screens/Tasks';
 
 const Stack = createStackNavigator();
 
@@ -17,17 +16,14 @@ const RootStack = () => {
   return (
     <Stack.Navigator
       screenOptions={{ headerShown: false }}
-      initialRouteName={user ? 'Main' : 'Start'} // Set default screen based on auth status
+      initialRouteName={user ? 'Main' : 'Start'}
     >
-      {/* Authenticated User Screens */}
       {user ? (
-        <>
-          <Stack.Screen name="Main" component={Main} />
-          <Stack.Screen name="Tasks" component={Tasks} />
-        </>
+        // Main navigator for authenticated users
+        <Stack.Screen name="Main" component={Main} />
       ) : (
+        // Stack for unauthenticated users
         <>
-          {/* Unauthenticated User Screens */}
           <Stack.Screen name="Start" component={Start} />
           <Stack.Screen name="Login" component={Login} />
           <Stack.Screen name="Register" component={Register} />

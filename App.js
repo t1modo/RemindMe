@@ -13,7 +13,7 @@ const App = () => {
 };
 
 const NavigationWrapper = () => {
-  const { user, loading } = useAuth(); // Get loading state
+  const { user, loading } = useAuth();
 
   if (loading) {
     return <Loading size={50} stroke={4} speed={1} color="#40916C" />;

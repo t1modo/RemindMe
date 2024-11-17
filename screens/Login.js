@@ -66,7 +66,8 @@ const Login = () => {
       const auth = getAuth();
       await signInWithEmailAndPassword(auth, email_address, password);
       Alert.alert('Success', 'Logged in successfully!');
-      navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
+      // Use navigate instead of reset
+      navigation.navigate('Main');
     } catch (error) {
       Alert.alert('Login Failed', error.message);
     }

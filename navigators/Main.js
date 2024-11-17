@@ -1,5 +1,5 @@
-import React from "react";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import React from 'react';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesome } from '@expo/vector-icons';
 
 // Import Screens
@@ -19,20 +19,20 @@ const Main = () => {
           if (route.name === 'Profile') {
             iconName = 'user';
           } else if (route.name === 'Tasks') {
-            iconName = 'folder';  // Icon for Tasks
+            iconName = 'folder';
           } else if (route.name === 'Logs') {
-            iconName = 'bell';    // Icon for Logs
+            iconName = 'bell';
           }
           return <FontAwesome name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#ffffff',  // Active tab color
-        tabBarInactiveTintColor: '#b7e4c7',  // Inactive tab color
+        tabBarActiveTintColor: '#ffffff',
+        tabBarInactiveTintColor: '#b7e4c7',
         tabBarStyle: {
-          backgroundColor: '#40916C',  // Tab bar background color
-          borderTopWidth: 3,  // Border between tabs
-          borderTopColor: '#40916C',  // Tab border color
+          backgroundColor: '#40916C',
+          borderTopWidth: 3,
+          borderTopColor: '#40916C',
         },
-        headerShown: false,  // Hide header for each screen
+        headerShown: false,
       })}
     >
       <Tab.Screen name="Profile" component={Profile} />

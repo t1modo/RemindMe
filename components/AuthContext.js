@@ -14,22 +14,23 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const auth = getAuth();
+    // Listen to auth state changes
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser || null);
-      setLoading(false);
+      setUser(currentUser || null); // Update user state
+      setLoading(false); // Done loading when auth state is determined
     });
 
     // Cleanup subscription on unmount
     return () => unsubscribe();
   }, []);
 
-  // Login function using Firebase Authentication
+  // Login function
   const login = async (email, password) => {
     const auth = getAuth();
     return signInWithEmailAndPassword(auth, email, password);
   };
 
-  // Logout function using Firebase Authentication
+  // Logout function
   const logout = async () => {
     const auth = getAuth();
     return signOut(auth);
@@ -37,7 +38,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={{ user, loading, login, logout }}>
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 };
