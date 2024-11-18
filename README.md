@@ -22,3 +22,14 @@ RemindMe is a mobile application designed for students to help them stay organiz
 - **React Native**: A JavaScript framework for building cross-platform mobile apps.
 - **Expo**: A set of tools for React Native that simplifies development, testing, and deployment.
 - **Firebase**: A comprehensive backend platform for storing user data and assignments, enabling real-time data synchronization and secure account management.
+
+---
+
+## Try It Out
+
+Scan the QR code below to access the app:
+
+![Scan to Try RemindMe](assets/qrCode_RemindMe.svg)
+
+---
+
