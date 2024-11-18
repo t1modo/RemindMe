@@ -3,7 +3,7 @@ import { View, Text, TextInput, StyleSheet, FlatList, TouchableOpacity, Alert } 
 import { FontAwesome } from '@expo/vector-icons';
 import { Calendar } from 'react-native-calendars';
 import { LinearGradient } from 'expo-linear-gradient';
-import { collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
+import { collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, getDocs } from 'firebase/firestore';
 import { db } from '../components/FirebaseConfig';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { useNavigation } from '@react-navigation/native';
@@ -58,6 +58,43 @@ const Tasks = () => {
     });
 
     return () => unsubscribe();
+  }, [user]);
+
+  // Function to delete old tasks (tasks with a past due date)
+  const deleteOldTasks = async () => {
+    if (!user) {
+      Alert.alert("Error", "No user is logged in.");
+      return;
+    }
+
+    const tasksRef = collection(db, 'users', user.uid, 'tasks');
+    const querySnapshot = await getDocs(tasksRef);
+
+    const today = new Date();
+    querySnapshot.forEach(async (docSnap) => {
+      const task = docSnap.data();
+      const taskDueDate = new Date(task.dueDate);
+
+      // Check if the task's due date is before today's date
+      if (taskDueDate < today) {
+        try {
+          await deleteDoc(doc(db, 'users', user.uid, 'tasks', docSnap.id));
+        } catch (error) {
+          Alert.alert("Error", "Failed to delete old task: " + error.message);
+        }
+      }
+    });
+  };
+
+  // Call deleteOldTasks periodically
+  useEffect(() => {
+    // Set an interval to check for old tasks every 24 hours (86400000 ms)
+    const intervalId = setInterval(() => {
+      deleteOldTasks();
+    }, 86400000); // 24 hours
+
+    // Cleanup the interval on component unmount
+    return () => clearInterval(intervalId);
   }, [user]);
 
   const handleAddTask = async () => {
