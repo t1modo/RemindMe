@@ -38,30 +38,33 @@ const Logs = () => {
   const fetchAndNotify = async (userId) => {
     const tasksRef = collection(db, "users", userId, "tasks");
     const q = query(tasksRef);
-
+  
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Start of the day
-
+    today.setHours(0, 0, 0, 0); // Start of today
+  
+    const tomorrow = new Date(today); // Clone today's date
+    tomorrow.setDate(tomorrow.getDate() - 1);
+  
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const todayNotifications = [];
-
+      const tomorrowNotifications = [];
+  
       snapshot.forEach((doc) => {
         const task = doc.data();
         const taskDueDate = task.dueDate.toDate ? task.dueDate.toDate() : new Date(task.dueDate);
-
-        // Check if the task is due today
+  
+        // Check if the task is due tomorrow
         taskDueDate.setHours(0, 0, 0, 0); // Normalize time
-        if (taskDueDate.getTime() === today.getTime()) {
-          todayNotifications.push({ id: doc.id, ...task });
+        if (taskDueDate.getTime() === tomorrow.getTime()) {
+          tomorrowNotifications.push({ id: doc.id, ...task });
           sendLocalNotification(task.assignmentName);
         }
       });
-
-      setNotifications(todayNotifications); // Update state with today's notifications
+  
+      setNotifications(tomorrowNotifications); // Update state with tomorrow's notifications
     });
-
+  
     return unsubscribe;
-  };
+  };  
 
   // Send a local notification
   const sendLocalNotification = (assignmentName) => {
