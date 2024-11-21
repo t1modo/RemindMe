@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Switch, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { getAuth, signOut } from 'firebase/auth';
 
+// Get device dimensions
+const { width, height } = Dimensions.get('window');
+
 const Profile = () => {
   const navigation = useNavigation();
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [email, setEmail] = useState(null);
 
   useEffect(() => {
@@ -41,14 +43,6 @@ const Profile = () => {
     }
   };
 
-  const handleToggleNotifications = () => {
-    setNotificationsEnabled(!notificationsEnabled);
-    Alert.alert(
-      "Notifications",
-      `Notifications have been ${!notificationsEnabled ? "enabled" : "disabled"}.`
-    );
-  };
-
   return (
     <LinearGradient
       colors={['#40916c', '#52b788', '#74c69d']}
@@ -56,35 +50,27 @@ const Profile = () => {
     >
       <View style={styles.container}>
         <Text style={styles.header}>User Profile</Text>
-        <View style={styles.section}>
-          <Text style={styles.label}>Email:</Text>
-          <Text style={styles.email}>{email}</Text>
-        </View>
 
-        <View style={styles.buttonContainer}>
+        <View style={styles.contentContainer}>
+          <View style={styles.emailContainer}>
+            <Text style={styles.label}>Email:</Text>
+            <Text style={styles.email}>{email}</Text>
+          </View>
+
           <TouchableOpacity
-            style={styles.button}
+            style={styles.changePasswordButton}
             onPress={() => Alert.alert("Change Password", "This will navigate to change password screen.")}
           >
             <Text style={styles.buttonText}>Change Password</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.button, styles.logoutButton]}
-            onPress={confirmLogout}
-          >
-            <Text style={styles.buttonText}>Logout</Text>
-          </TouchableOpacity>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.label}>Toggle Notifications:</Text>
-          <Switch
-            value={notificationsEnabled}
-            onValueChange={handleToggleNotifications}
-            thumbColor={notificationsEnabled ? '#2d6a4f' : '#FF4500'}
-            trackColor={{ false: '#FF6347', true: '#90EE90' }}
-          />
-        </View>
+        <TouchableOpacity
+          style={styles.logoutButton}
+          onPress={confirmLogout}
+        >
+          <Text style={styles.buttonText}>Logout</Text>
+        </TouchableOpacity>
       </View>
     </LinearGradient>
   );
@@ -96,47 +82,58 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
+    paddingHorizontal: width * 0.05, // 5% of screen width
+    paddingVertical: height * 0.05, // 5% of screen height
   },
   header: {
-    fontSize: 30,
+    fontSize: width * 0.08,
     fontWeight: 'bold',
-    marginBottom: 20,
     color: '#fff',
+    textAlign: 'center',
+    marginTop: height * 0.04, // 4% of screen height
+    marginBottom: height * 0.04, // 4% of screen height
   },
-  section: {
-    marginVertical: 10,
-    alignItems: 'center',
+  contentContainer: {
+    backgroundColor: '#ffffff20',
+    padding: width * 0.05, // 5% of screen width
+    borderRadius: 10,
+    marginBottom: height * 0.03, // 3% of screen height
+  },
+  emailContainer: {
+    marginBottom: height * 0.02, // 2% of screen height
   },
   label: {
-    fontSize: 18,
+    fontSize: width * 0.045, // 4.5% of screen width
     color: '#fff',
-    fontWeight: 'bold',
+    marginBottom: height * 0.01, // 1% of screen height
+    textAlign: 'left',
   },
   email: {
-    fontSize: 16,
+    fontSize: width * 0.04, // 4% of screen width
     color: '#fff',
+    marginBottom: height * 0.01, // 1% of screen height
   },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginVertical: 20,
-  },
-  button: {
+  changePasswordButton: {
     backgroundColor: '#40916c',
-    padding: 10,
+    padding: height * 0.02, // 2% of screen height
     borderRadius: 5,
-    marginHorizontal: 5,
+    alignSelf: 'center',
     alignItems: 'center',
+    width: '80%',
   },
   logoutButton: {
+    position: 'absolute',
+    bottom: height * 0.05, // 5% of screen height
+    left: width * 0.05, // 5% of screen width
+    right: width * 0.05, // 5% of screen width
     backgroundColor: '#d9534f',
+    padding: height * 0.02, // 2% of screen height
+    borderRadius: 10,
+    alignItems: 'center',
   },
   buttonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: width * 0.045, // 4.5% of screen width
     fontWeight: 'bold',
   },
 });
