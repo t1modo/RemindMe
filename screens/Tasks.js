@@ -8,7 +8,6 @@ import { db } from '../components/FirebaseConfig';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { useNavigation } from '@react-navigation/native';
 
-// Helper function to format date in MM/DD/YYYY
 const formatDate = (dateString) => {
   const date = new Date(dateString);
   const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -26,18 +25,16 @@ const Tasks = () => {
   const [dueDate, setDueDate] = useState("");
   const [markedDate, setMarkedDate] = useState('');
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const navigation = useNavigation();
 
-  // Get the current user
   useEffect(() => {
     const auth = getAuth();
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUser(user);
-      } else {
-        setUser(null);
-        // Redirect to login if not authenticated
+      setUser(user);
+      setLoading(false); 
+      if (!user) {
         navigation.replace('Login');
       }
     });
@@ -45,12 +42,11 @@ const Tasks = () => {
     return unsubscribeAuth;
   }, []);
 
-  // Fetch tasks from Firestore
   useEffect(() => {
     if (!user) return;
 
     const tasksRef = collection(db, 'users', user.uid, 'tasks');
-    const q = query(tasksRef, orderBy('dueDate'));
+    const q = query(tasksRef, orderBy('dueDate')); 
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const tasksData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -60,41 +56,44 @@ const Tasks = () => {
     return () => unsubscribe();
   }, [user]);
 
-  // Function to delete old tasks (tasks with a past due date)
   const deleteOldTasks = async () => {
     if (!user) {
-      Alert.alert("Error", "No user is logged in.");
+      console.warn("Skipping task deletion, no user logged in.");
       return;
     }
 
-    const tasksRef = collection(db, 'users', user.uid, 'tasks');
-    const querySnapshot = await getDocs(tasksRef);
+    try {
+      const tasksRef = collection(db, 'users', user.uid, 'tasks');
+      const querySnapshot = await getDocs(tasksRef);
 
-    const today = new Date();
-    querySnapshot.forEach(async (docSnap) => {
-      const task = docSnap.data();
-      const taskDueDate = new Date(task.dueDate);
+      const today = new Date();
+      today.setDate(today.getDate() - 1);
+      today.setHours(0, 0, 0, 0);
 
-      // Check if the task's due date is before today's date
-      if (taskDueDate < today) {
-        try {
+      querySnapshot.forEach(async (docSnap) => {
+        const task = docSnap.data();
+        const taskDueDate = new Date(task.dueDate);
+
+        if (taskDueDate < today) {
           await deleteDoc(doc(db, 'users', user.uid, 'tasks', docSnap.id));
-        } catch (error) {
-          Alert.alert("Error", "Failed to delete old task: " + error.message);
         }
-      }
-    });
+      });
+    } catch (error) {
+      console.error("Error fetching or deleting tasks: ", error.message);
+    }
   };
 
-  // Call deleteOldTasks periodically
   useEffect(() => {
-    // Set an interval to check for old tasks every 24 hours (86400000 ms)
+    if (!user) return;
     const intervalId = setInterval(() => {
       deleteOldTasks();
-    }, 86400000); // 24 hours
+    }, 86400000);
 
-    // Cleanup the interval on component unmount
     return () => clearInterval(intervalId);
+  }, [user]);
+
+  useEffect(() => {
+    if (user) deleteOldTasks();
   }, [user]);
 
   const handleAddTask = async () => {
@@ -159,12 +158,22 @@ const Tasks = () => {
 
   const today = new Date().toISOString().split('T')[0];
 
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
+
   return (
     <LinearGradient
       colors={['#40916c', '#52b788', '#74c69d']}
       style={styles.gradientContainer}
     >
       <View style={styles.container}>
+        <Text style={styles.tasksLabel}>Tasks</Text>
+
         <FlatList
           data={tasks}
           renderItem={renderItem}
@@ -178,79 +187,6 @@ const Tasks = () => {
         >
           <FontAwesome name="plus-circle" size={40} color="#fff" />
         </TouchableOpacity>
-
-        {showModal && (
-          <View style={styles.modal}>
-            <View style={styles.modalContent}>
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>Class</Text>
-                <TextInput
-                  style={styles.input}
-                  value={className}
-                  onChangeText={setClassName}
-                />
-              </View>
-
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>Assignment Name</Text>
-                <TextInput
-                  style={styles.input}
-                  value={assignmentName}
-                  onChangeText={setAssignmentName}
-                />
-              </View>
-
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>Due Date</Text>
-                <TouchableOpacity
-                  style={styles.input}
-                  onPress={() => setShowCalendarModal(true)}
-                >
-                  <Text style={styles.inputText}>{dueDate ? formatDate(dueDate) : 'Select a date'}</Text>
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.buttonsContainer}>
-                <TouchableOpacity style={styles.saveButton} onPress={handleAddTask}>
-                  <Text style={styles.saveButtonText}>Save Task</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.cancelButton} onPress={() => setShowModal(false)}>
-                  <Text style={styles.cancelButtonText}>Cancel</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        )}
-
-        {showCalendarModal && (
-          <View style={styles.calendarModal}>
-            <View style={styles.calendarModalContent}>
-              <Calendar
-                onDayPress={handleDateSelect}
-                markedDates={{
-                  [markedDate]: { selected: true, selectedColor: '#40916C', selectedTextColor: '#fff' },
-                }}
-                monthFormat={'MMMM yyyy'}
-                markingType="simple"
-                theme={{
-                  textSectionTitleColor: '#000',
-                  arrowColor: '#40916C',
-                  dayTextColor: '#000',
-                  selectedDayBackgroundColor: '#40916C',
-                  selectedDayTextColor: '#ffffff',
-                  todayTextColor: '#40916C',
-                }}
-                minDate={today}
-              />
-              <TouchableOpacity
-                style={styles.closeCalendarButton}
-                onPress={() => setShowCalendarModal(false)}
-              >
-                <Text style={styles.closeCalendarButtonText}>Close</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        )}
       </View>
     </LinearGradient>
   );
@@ -265,6 +201,14 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     alignItems: "center",
     padding: 20,
+  },
+  tasksLabel: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginTop: 45,
+    marginBottom: 10,
+    textAlign: 'center',
   },
   tasksList: {
     flexGrow: 1,
@@ -310,100 +254,6 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     padding: 10,
     elevation: 5,
-  },
-  modal: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContent: {
-    backgroundColor: "#fff",
-    padding: 20,
-    borderRadius: 10,
-    width: "80%",
-  },
-  inputContainer: {
-    marginBottom: 15,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "#000",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 10,
-    borderRadius: 5,
-    fontSize: 16,
-    color: "#333",
-  },
-  inputText: {
-    fontSize: 16,
-    color: "#333",
-  },
-  buttonsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  saveButton: {
-    backgroundColor: "#40916C",
-    padding: 10,
-    borderRadius: 5,
-    width: "45%",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  saveButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  cancelButton: {
-    backgroundColor: "#ccc",
-    padding: 10,
-    borderRadius: 5,
-    width: "45%",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  cancelButtonText: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  calendarModal: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  calendarModalContent: {
-    backgroundColor: "#fff",
-    padding: 20,
-    borderRadius: 10,
-    width: "80%",
-  },
-  closeCalendarButton: {
-    marginTop: 20,
-    backgroundColor: "#40916C",
-    padding: 10,
-    borderRadius: 5,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  closeCalendarButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
   },
 });
 

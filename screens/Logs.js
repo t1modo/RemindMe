@@ -6,6 +6,7 @@ import * as Notifications from 'expo-notifications';
 import { collection, onSnapshot, query } from 'firebase/firestore';
 import { db } from '../components/FirebaseConfig';
 import { getAuth } from 'firebase/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Get device dimensions
 const { width, height } = Dimensions.get('window');
@@ -30,15 +31,42 @@ const Logs = () => {
 
     if (currentUser) {
       setUser(currentUser);
-      if (notificationsEnabled) {
-        fetchAndNotify(currentUser.uid); // Fetch tasks if notifications are enabled
-      }
+      loadNotificationPreference(); // Load saved preference
     } else {
       console.log('No user logged in');
     }
-  }, [notificationsEnabled]); // Re-run when notificationsEnabled changes
+  }, []);
 
-  const fetchAndNotify = async (userId) => {
+  useEffect(() => {
+    if (!user) return;
+    const unsubscribe = fetchAndNotify(user.uid);
+
+    return () => {
+      // Cleanup the snapshot listener
+      if (unsubscribe) unsubscribe();
+    };
+  }, [user, notificationsEnabled]); // Re-run on state change
+
+  const loadNotificationPreference = async () => {
+    try {
+      const savedPreference = await AsyncStorage.getItem('notificationsEnabled');
+      if (savedPreference !== null) {
+        setNotificationsEnabled(JSON.parse(savedPreference));
+      }
+    } catch (error) {
+      console.error('Failed to load notification preference:', error);
+    }
+  };
+
+  const saveNotificationPreference = async (value) => {
+    try {
+      await AsyncStorage.setItem('notificationsEnabled', JSON.stringify(value));
+    } catch (error) {
+      console.error('Failed to save notification preference:', error);
+    }
+  };
+
+  const fetchAndNotify = (userId) => {
     const tasksRef = collection(db, 'users', userId, 'tasks');
     const q = query(tasksRef);
 
@@ -61,20 +89,21 @@ const Logs = () => {
         // Check if the task is due on the adjusted "today" (one day before)
         if (taskDueDate.getTime() === today.getTime()) {
           todayNotifications.push({ id: doc.id, ...task });
+          // Send notification only if notifications are enabled
           if (notificationsEnabled) {
             sendLocalNotification(task.assignmentName);
           }
         }
       });
 
-      setNotifications(todayNotifications); // Update state with today's notifications
+      // Always update the state to show assignments due today
+      setNotifications(todayNotifications);
     });
 
     return unsubscribe;
   };
 
   const sendLocalNotification = (assignmentName) => {
-    if (!notificationsEnabled) return; // Prevent notifications if disabled
     Notifications.scheduleNotificationAsync({
       content: {
         title: 'Assignment Due Today 📌',
@@ -87,6 +116,7 @@ const Logs = () => {
   const handleToggleNotifications = () => {
     setNotificationsEnabled((prev) => {
       const newValue = !prev;
+      saveNotificationPreference(newValue); // Save the toggle state
       Alert.alert(
         'Notifications',
         `Notifications have been ${newValue ? 'enabled' : 'disabled'}.`
