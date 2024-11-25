@@ -71,24 +71,25 @@ const Logs = () => {
     const q = query(tasksRef);
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
+      // Get today's date in UTC, normalized to the start of the day
       const today = new Date();
-      today.setDate(today.getDate() - 1); // Set to one day before
-      today.setHours(0, 0, 0, 0); // Normalize time to start of the day
+      today.setUTCHours(0, 0, 0, 0);
 
       const todayNotifications = [];
 
       snapshot.forEach((doc) => {
         const task = doc.data();
 
-        // Convert task due date to a Date object
+        // Convert task due date to a Date object, assuming task.dueDate is in UTC
         const taskDueDate = task.dueDate.toDate ? task.dueDate.toDate() : new Date(task.dueDate);
 
-        // Normalize taskDueDate to start of the day
-        taskDueDate.setHours(0, 0, 0, 0);
+        // Normalize taskDueDate to the start of the day in UTC
+        taskDueDate.setUTCHours(0, 0, 0, 0);
 
-        // Check if the task is due on the adjusted "today" (one day before)
+        // Compare taskDueDate with today (both in UTC)
         if (taskDueDate.getTime() === today.getTime()) {
           todayNotifications.push({ id: doc.id, ...task });
+
           // Send notification only if notifications are enabled
           if (notificationsEnabled) {
             sendLocalNotification(task.assignmentName);
@@ -101,7 +102,7 @@ const Logs = () => {
     });
 
     return unsubscribe;
-  };
+};
 
   const sendLocalNotification = (assignmentName) => {
     Notifications.scheduleNotificationAsync({
