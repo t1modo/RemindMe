@@ -16,7 +16,7 @@ const Profile = () => {
     const currentUser = auth.currentUser;
 
     if (currentUser) {
-      setEmail(currentUser.email); // Fetch the user's email
+      setEmail(currentUser.email);
     } else {
       setEmail('Not Logged In');
     }
@@ -59,7 +59,7 @@ const Profile = () => {
 
           <TouchableOpacity
             style={styles.changePasswordButton}
-            onPress={() => Alert.alert("Change Password", "This will navigate to change password screen.")}
+            onPress={() => navigation.navigate('ChangePassword')}
           >
             <Text style={styles.buttonText}>Change Password</Text>
           </TouchableOpacity>
@@ -82,58 +82,49 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    paddingHorizontal: width * 0.05, // 5% of screen width
-    paddingVertical: height * 0.05, // 5% of screen height
+    paddingHorizontal: width * 0.05,
+    paddingVertical: height * 0.05,
   },
   header: {
     fontSize: width * 0.08,
     fontWeight: 'bold',
     color: '#fff',
     textAlign: 'center',
-    marginTop: height * 0.04, // 4% of screen height
-    marginBottom: height * 0.04, // 4% of screen height
+    marginTop: height * 0.04,
+    marginBottom: height * 0.04,
   },
   contentContainer: {
     backgroundColor: '#ffffff20',
-    padding: width * 0.05, // 5% of screen width
+    padding: width * 0.05,
     borderRadius: 10,
-    marginBottom: height * 0.03, // 3% of screen height
+    marginBottom: height * 0.03,
   },
   emailContainer: {
-    marginBottom: height * 0.02, // 2% of screen height
+    marginBottom: height * 0.02,
   },
   label: {
-    fontSize: width * 0.045, // 4.5% of screen width
+    fontSize: width * 0.045,
     color: '#fff',
-    marginBottom: height * 0.01, // 1% of screen height
-    textAlign: 'left',
   },
   email: {
-    fontSize: width * 0.04, // 4% of screen width
+    fontSize: width * 0.04,
     color: '#fff',
-    marginBottom: height * 0.01, // 1% of screen height
   },
   changePasswordButton: {
     backgroundColor: '#40916c',
-    padding: height * 0.02, // 2% of screen height
+    padding: height * 0.02,
     borderRadius: 5,
-    alignSelf: 'center',
     alignItems: 'center',
-    width: '80%',
   },
   logoutButton: {
-    position: 'absolute',
-    bottom: height * 0.05, // 5% of screen height
-    left: width * 0.05, // 5% of screen width
-    right: width * 0.05, // 5% of screen width
     backgroundColor: '#d9534f',
-    padding: height * 0.02, // 2% of screen height
+    padding: height * 0.02,
     borderRadius: 10,
     alignItems: 'center',
   },
   buttonText: {
     color: '#fff',
-    fontSize: width * 0.045, // 4.5% of screen width
+    fontSize: width * 0.045,
     fontWeight: 'bold',
   },
 });

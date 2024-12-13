@@ -7,6 +7,7 @@ import Start from '../screens/Start';
 import Login from '../screens/Login';
 import Register from '../screens/Register';
 import Main from '../navigators/Main';
+import ChangePassword from '../screens/ChangePassword'; // Import ChangePassword
 
 const Stack = createStackNavigator();
 
@@ -19,10 +20,11 @@ const RootStack = () => {
       initialRouteName={user ? 'Main' : 'Start'}
     >
       {user ? (
-        // Main navigator for authenticated users
-        <Stack.Screen name="Main" component={Main} />
+        <>
+          <Stack.Screen name="Main" component={Main} />
+          <Stack.Screen name="ChangePassword" component={ChangePassword} /> 
+        </>
       ) : (
-        // Stack for unauthenticated users
         <>
           <Stack.Screen name="Start" component={Start} />
           <Stack.Screen name="Login" component={Login} />
