@@ -28,7 +28,7 @@ RemindMe is a mobile application designed for students to help them stay organiz
 
 ## Try It Out
 
-Scan the QR code below to access the app:
+Scan the QR code below to access the app (Make sure you have **Expo Go** installed on your cellular device):
 
 ![Scan to Try RemindMe](assets/qrCode_RemindMe.svg)
 
