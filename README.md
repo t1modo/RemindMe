@@ -4,8 +4,6 @@
 
 RemindMe is a mobile application designed for students to help them stay organized by tracking upcoming assignments. Users can create an account, add assignments with due dates, and receive notifications when assignments are nearing their due dates (within 24 hours). The app aims to simplify academic task management in a user-friendly, mobile-first interface.
 
----
-
 ## Features
 
 - **User Account Creation**: Sign up and create an account to store assignments and deadlines.
@@ -15,8 +13,6 @@ RemindMe is a mobile application designed for students to help them stay organiz
 - **Notification Feature**: Users receive notifications when an assignment is within 24 hours of being due.
 - **Log Report**: A history of previous notifications sent to the user, allowing them to track deadlines and reminders.
 
----
-
 ## Technologies Used
 
 - **React**: A JavaScript library for building user interfaces, focusing on building reusable UI components and managing the state efficiently.
@@ -24,13 +20,10 @@ RemindMe is a mobile application designed for students to help them stay organiz
 - **Expo**: A set of tools for React Native that simplifies development, testing, and deployment.
 - **Firebase**: A comprehensive backend platform for storing user data and assignments, enabling real-time data synchronization and secure account management.
 
----
 
 ## Try It Out
 
 Scan the QR code below to access the app (Make sure you have **Expo Go** installed on your cellular device):
 
 ![Scan to Try RemindMe](assets/qrCode_RemindMe.svg)
-
----
 
